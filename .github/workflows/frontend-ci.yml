@@ -7,21 +7,13 @@ on:
       - release
       - dev
 
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to analyze"
-        required: false
-        default: "master"
-
 jobs:
   build-and-analyze:
     name: Build and Analyze Frontend Application
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -53,23 +45,21 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${SONAR_TOKEN}
 
-  trigger-cd:
+  trigger-frontend-cd:
     name: Trigger Frontend CD Workflow
     needs: build-and-analyze
     runs-on: ubuntu-latest
     if: ${{ needs.build-and-analyze.result == 'success' }}
-
     steps:
       - name: Trigger Frontend CD Workflow
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.actions.createWorkflowDispatch({
+            github.rest.repos.createDispatchEvent({
               owner: 'obligatorio-devops-agustin',
               repo: 'devops',
-              workflow_id: 'frontend-cd.yml',
-              ref: context.ref,
-              inputs: {
-                branch: context.ref.replace('refs/heads/', '')
+              event_type: 'trigger-frontend-cd',
+              client_payload: {
+                branch: '${{ github.ref_name }}'
               }
             });
