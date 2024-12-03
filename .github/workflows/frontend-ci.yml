@@ -45,7 +45,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${SONAR_TOKEN}
 
-  trigger-frontend-cd:
+  trigger-cd:
     name: Trigger Frontend CD Workflow
     needs: build-and-analyze
     runs-on: ubuntu-latest
@@ -55,11 +55,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.repos.createDispatchEvent({
-              owner: 'obligatorio-devops-agustin',
-              repo: 'devops',
-              event_type: 'trigger-frontend-cd',
-              client_payload: {
-                branch: '${{ github.ref_name }}'
-              }
-            });
+              github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'frontend-cd.yml',
+                ref: context.ref,
+                inputs: {
+                  branch: context.ref.replace('refs/heads/', ''),
+                }
+              });
