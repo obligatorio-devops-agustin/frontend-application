@@ -52,4 +52,4 @@ jobs:
             echo "Branch not configured for deployment: ${{ inputs.branch }}"
             exit 1
           fi
-          aws s3 sync ./build s3://$BUCKET_NAME --delete
+          aws s3 sync ./dist/apps/catalog s3://$BUCKET_NAME --delete
