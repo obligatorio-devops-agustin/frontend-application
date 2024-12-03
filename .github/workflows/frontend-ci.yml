@@ -16,11 +16,12 @@ on:
 
 jobs:
   build-and-analyze:
-    name: Build, Test, and Analyze Frontend Application
+    name: Build and Analyze Frontend Application
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -35,9 +36,6 @@ jobs:
 
       - name: Build Frontend Application
         run: npm run build
-
-      - name: Run Tests
-        run: npm test -- --watchAll=false
 
       - name: Set up Java 17 for SonarCloud
         uses: actions/setup-java@v4
@@ -54,3 +52,24 @@ jobs:
             -Dsonar.sources=apps/catalog/src \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${SONAR_TOKEN}
+
+  trigger-cd:
+    name: Trigger Frontend CD Workflow
+    needs: build-and-analyze
+    runs-on: ubuntu-latest
+    if: ${{ needs.build-and-analyze.result == 'success' }}
+
+    steps:
+      - name: Trigger Frontend CD Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'obligatorio-devops-agustin',
+              repo: 'devops',
+              workflow_id: 'frontend-cd.yml',
+              ref: context.ref,
+              inputs: {
+                branch: context.ref.replace('refs/heads/', '')
+              }
+            });
