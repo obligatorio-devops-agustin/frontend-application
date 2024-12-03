@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-and-analyze:
-    name: Build and Analyze Frontend Application
+    name: Build, Test, and Analyze Frontend Application
     runs-on: ubuntu-latest
 
     steps:
@@ -36,19 +36,21 @@ jobs:
       - name: Build Frontend Application
         run: npm run build
 
-      - name: Cache SonarQube Cloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Run Tests
+        run: npm test -- --watchAll=false
 
-      - name: SonarCloud Analysis
+      - name: Set up Java 17 for SonarCloud
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           npx sonar-scanner \
-            -Dsonar.projectKey=obligatorio-devops-agustin_frontend-application \
+            -Dsonar.projectKey=obligatorio-devops-agustin_frontend-app \
             -Dsonar.sources=src \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${SONAR_TOKEN}
