@@ -44,8 +44,8 @@ jobs:
         run: |
           if [ "${{ inputs.branch }}" == "dev" ]; then
             BUCKET_NAME="frontend-application-dev"
-          elif [ "${{ inputs.branch }}" == "release" ]; then
-            BUCKET_NAME="frontend-application-release"
+          elif [ "${{ inputs.branch }}" == "staging" ]; then
+            BUCKET_NAME="frontend-application-staging"
           elif [ "${{ inputs.branch }}" == "master" ]; then
             BUCKET_NAME="frontend-application-master"
           else
