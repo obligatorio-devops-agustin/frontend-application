@@ -1,0 +1,54 @@
+name: Frontend CI Workflow
+
+on:
+  push:
+    branches:
+      - master
+      - release
+      - dev
+
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to analyze"
+        required: false
+        default: "master"
+
+jobs:
+  build-and-analyze:
+    name: Build and Analyze Frontend Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Frontend Application
+        run: npm run build
+
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npx sonar-scanner \
+            -Dsonar.projectKey=obligatorio-devops-agustin_frontend-application \
+            -Dsonar.sources=src \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${SONAR_TOKEN}
