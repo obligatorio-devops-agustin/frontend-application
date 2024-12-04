@@ -17,6 +17,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug Payload
+        run: |
+          echo "Payload to send:"
+          echo '{
+            "repo": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}"
+          }'
+
       - name: Trigger Workflow in Repo B
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
