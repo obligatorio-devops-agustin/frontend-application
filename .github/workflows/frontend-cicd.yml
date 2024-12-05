@@ -8,7 +8,7 @@ on:
       - dev
 
 jobs:
-  cicd-workflow:
+  trigger-workflow:
     runs-on: ubuntu-latest
     permissions:
       contents: write
