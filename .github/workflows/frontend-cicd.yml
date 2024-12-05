@@ -8,7 +8,7 @@ on:
       - dev
 
 jobs:
-  ci-workflow:
+  cicd-workflow:
     runs-on: ubuntu-latest
     permissions:
       contents: write
