@@ -8,7 +8,7 @@ on:
       - dev
 
 jobs:
-  ci-workflow:
+  cicd-workflow:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Trigger Workflow in Repo B
+      - name: Trigger Workflow in Devops Repository
         env:
           DEVOPS_TOKEN: ${{ secrets.DEVOPS_TOKEN }}
         run: |
